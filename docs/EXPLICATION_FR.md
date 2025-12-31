@@ -1,45 +1,64 @@
-# Pattern Compound (MVC) — Explication détaillée (FR)
+# Pattern Compound (Compound Patterns) — MVC + patterns combinés (FR)
 
 ## 1) Intention
-Un **compound pattern** est une **composition** de patterns qui coopèrent pour résoudre un problème complet.
-Ici : l’exemple “Beat Model” combine **MVC** avec Observer (et parfois Strategy/Adapter selon versions).
+Un **compound pattern** n’est pas “un pattern unique” : c’est une **composition de plusieurs patterns** qui travaillent ensemble pour résoudre un problème plus large.
 
-## 2) MVC en 10 secondes
-- **Model** : état + logique (ex: BPM, start/stop)
-- **View** : affichage (console/GUI)
-- **Controller** : reçoit les actions utilisateur et pilote le modèle
+Dans Head First, l’exemple classique est **MVC**, qui combine souvent :
+- **Observer** (la vue s’abonne au modèle)
+- **Strategy** (variation d’algorithmes / comportements)
+- **Composite** (structure hiérarchique de vues/composants)
+- parfois **Adapter**, **Factory**, etc.
 
-## 3) Pourquoi on combine des patterns
-MVC seul ne suffit pas : la vue doit être notifiée quand le modèle change.
-Donc on ajoute **Observer** :
-- la vue s’abonne au modèle
-- le modèle notifie au changement de BPM / beat
+## 2) Problème typique
+Construire une application interactive sans mélanger :
+- logique métier (modèle)
+- affichage (vue)
+- gestion des actions utilisateur (contrôleur)
 
-## 4) Dans ce projet
-- `BeatModel` (ou équivalent) : modèle, gère BPM et beat
-- `DJView` (ou équivalent) : vue, affiche “Beat!” et BPM
-- `BeatController` : contrôle, change BPM, start/stop
+Sans séparation :
+- code difficile à maintenir
+- UI couplée au métier
+- modifications en cascade
+
+## 3) Principe (MVC)
+- **Model** : état + règles métier. Il notifie les vues quand ça change.
+- **View** : affiche l’état du modèle. Ne contient pas la logique métier.
+- **Controller** : traduit les actions utilisateur en opérations sur le modèle.
+
+## 4) Dans ce projet (Beat Model)
+Le projet simule un “beat” (rythme) :
+- le **modèle** gère le BPM + l’événement “beat”
+- la **vue** affiche les changements (BPM/beat)
+- le **contrôleur** demande start/stop et change le BPM
+
+On observe dans la sortie :
+- “Beat!”
+- “BPM = ...”
+- “Stopped.”
 
 ## 5) Déroulé du run
-Point d’entrée : `DJTestDrive` (ou main)
-Scénario :
-1) start → émission de beats
-2) setBPM (90, 120) → affichage BPM
-3) stop → arrêt
+Point d’entrée : classe `...TestDrive` / `main`
+1) initialisation MVC
+2) démarrage du modèle
+3) modifications de BPM
+4) arrêt
 
 ## 6) Avantages
-- Séparation claire responsabilités
-- Vue réactive via Observer
-- Testable : modèle testable sans UI
+- découplage fort : UI ≠ métier
+- testabilité améliorée (modèle testable sans UI)
+- évolution plus simple (changer la vue sans toucher au modèle)
 
 ## 7) Inconvénients
-- Beaucoup de classes
-- Nécessite discipline sur les dépendances (vue ne doit pas contenir la logique)
+- plus de classes / architecture plus lourde
+- nécessite une discipline (sinon on casse MVC)
 
 ## 8) Erreurs classiques
-- Controller qui fait de la logique modèle
-- Vue qui modifie le modèle directement (court-circuite le controller)
+- mettre de la logique métier dans la vue
+- contrôleur trop “intelligent” (devient un second modèle)
+- notifications mal gérées (boucles, updates inutiles)
 
 ## 9) Liens avec d’autres patterns
-- Observer : notifications modèle → vues
-- Strategy : variantes d’algorithmes (si utilisées)
+- Observer : vues abonnées au modèle
+- Composite : arbres de composants UI
+- Strategy : comportements remplaçables (ex: calculs/algos)
+- Factory : création des vues/contrôleurs
